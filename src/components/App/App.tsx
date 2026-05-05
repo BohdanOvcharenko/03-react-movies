@@ -1,0 +1,65 @@
+import SearchBar from '../SearchBar/SearchBar'
+import { Toaster } from 'react-hot-toast';
+import { useState } from 'react';
+import fetchMovies from '../../services/movieService';
+import type { Movie } from '../../types/movie';
+import toast from 'react-hot-toast';
+import MovieGrid from '../MovieGrid/MovieGrid';
+import css from './App.module.css';
+import ErrorMessage from '../ErrorMessage/ErrorMessage';
+import MovieModal from '../MovieModal/MovieModal';
+
+
+
+function App() {
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+
+   const handleSearch = async (query: string) => {
+     setMovies([]);
+     setLoading(true);
+     setError(false);
+
+     try {
+      const data = await fetchMovies(query);
+
+      if (data.length === 0) {
+        toast.error('No movies found for your request.');
+        return;
+      }
+
+      setMovies(data);
+     } catch (error) {
+       console.error(error);
+      setError(true);
+     }
+     finally {      setLoading(false);
+     }
+  };
+  
+
+  return (
+    <>
+      <Toaster />
+      <SearchBar onSubmit={handleSearch} />
+      {error ? (
+        <ErrorMessage />
+      ) : (
+        <MovieGrid movies={movies} onSelect={(movie) => {
+          setSelectedMovie(movie);
+        }} />
+      )}
+      {loading && <p className={css.text}>Loading movies, please wait...</p>}
+      {selectedMovie && (
+  <MovieModal
+    movie={selectedMovie}
+    onClose={() => setSelectedMovie(null)}
+  />
+)}
+    </>
+  )
+}
+
+export default App
