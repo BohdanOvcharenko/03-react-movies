@@ -5,9 +5,10 @@ import fetchMovies from '../../services/movieService';
 import type { Movie } from '../../types/movie';
 import toast from 'react-hot-toast';
 import MovieGrid from '../MovieGrid/MovieGrid';
-import css from './App.module.css';
 import ErrorMessage from '../ErrorMessage/ErrorMessage';
 import MovieModal from '../MovieModal/MovieModal';
+import Loader from '../Loader/Loader';
+import css from './App.module.css';
 
 
 
@@ -41,7 +42,7 @@ function App() {
   
 
   return (
-    <>
+    <div className={css.app}>
       <Toaster />
       <SearchBar onSubmit={handleSearch} />
       {error ? (
@@ -51,14 +52,14 @@ function App() {
           setSelectedMovie(movie);
         }} />
       )}
-      {loading && <p className={css.text}>Loading movies, please wait...</p>}
+      {loading && <Loader />}
       {selectedMovie && (
   <MovieModal
     movie={selectedMovie}
     onClose={() => setSelectedMovie(null)}
   />
 )}
-    </>
+    </div>
   )
 }
 
